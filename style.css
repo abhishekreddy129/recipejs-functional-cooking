@@ -38,7 +38,11 @@ main {
     padding: 0 1rem;
 }
 
+<<<<<<< HEAD
 /* Recipe Container - Flexbox Grid */
+=======
+/* Recipe Container */
+>>>>>>> 30b2a75486c7d178f7cc7828b45b56e87753c383
 #recipe-container {
     display: flex;
     flex-wrap: wrap;
@@ -86,7 +90,10 @@ main {
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: bold;
+<<<<<<< HEAD
     text-transform: capitalize;
+=======
+>>>>>>> 30b2a75486c7d178f7cc7828b45b56e87753c383
 }
 
 .difficulty.easy {

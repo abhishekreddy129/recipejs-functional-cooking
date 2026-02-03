@@ -68,9 +68,14 @@ const recipes = [
 
 // DOM Selection
 const recipeContainer = document.querySelector('#recipe-container');
+<<<<<<< HEAD
 console.log(recipeContainer);
 
 // Create recipe card
+=======
+
+// Create recipe card HTML
+>>>>>>> 30b2a75486c7d178f7cc7828b45b56e87753c383
 const createRecipeCard = (recipe) => {
     return `
         <div class="recipe-card" data-id="${recipe.id}">
@@ -88,6 +93,7 @@ const createRecipeCard = (recipe) => {
 
 // Render recipes
 const renderRecipes = (recipesToRender) => {
+<<<<<<< HEAD
     const recipeCardsHTML = recipesToRender
         .map(createRecipeCard)
         .join('');
@@ -98,4 +104,17 @@ const renderRecipes = (recipesToRender) => {
 // Initialize app
 console.log('Total recipes:', recipes.length);
 renderRecipes(recipes);
+=======
+    const html = recipesToRender
+        .map(createRecipeCard)
+        .join('');
+
+    recipeContainer.innerHTML = html;
+};
+
+// Initialize App
+renderRecipes(recipes);
+
+console.log('Total recipes:', recipes.length);
+>>>>>>> 30b2a75486c7d178f7cc7828b45b56e87753c383
 console.log('Rendering complete!');
