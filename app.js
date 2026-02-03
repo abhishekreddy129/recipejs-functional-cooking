@@ -1,123 +1,131 @@
-const RecipeApp = (() => {
-  console.log("RecipeApp initializing...");
+const RecipeApp = (function () {
+    console.log("RecipeApp initializing...");
 
-  /* ---------- DATA ---------- */
-  const recipes = [
-    {
-      id: 1,
-      title: "Spaghetti Carbonara",
-      description: "Classic creamy pasta",
-      time: 25,
-      difficulty: "easy",
-      ingredients: ["Pasta", "Eggs", "Cheese", "Black Pepper"],
-      steps: [
-        "Boil pasta",
+    /* ---------------- DATA ---------------- */
+    const recipes = [
         {
-          text: "Prepare sauce",
-          substeps: [
-            "Beat eggs",
-            "Add cheese",
-            {
-              text: "Season",
-              substeps: ["Add salt", "Add pepper"]
+            id: 1,
+            title: "Pasta",
+            difficulty: "Easy",
+            ingredients: [
+                "Pasta",
+                "Salt",
+                "Olive Oil",
+                "Garlic",
+                "Tomato Sauce"
+            ],
+            steps: [
+                "Boil water",
+                "Add pasta",
+                {
+                    text: "Prepare sauce",
+                    substeps: [
+                        "Heat oil",
+                        "Add garlic",
+                        {
+                            text: "Add spices",
+                            substeps: ["Chili flakes", "Oregano"]
+                        }
+                    ]
+                },
+                "Mix pasta and sauce",
+                "Serve hot"
+            ]
+        },
+        // 👉 add remaining recipes similarly
+    ];
+
+    const recipeContainer = document.querySelector("#recipe-container");
+
+    /* ---------------- RECURSION ---------------- */
+    const renderSteps = (steps, level = 0) => {
+        let html = "<ol class='step-level-" + level + "'>";
+
+        steps.forEach(step => {
+            if (typeof step === "string") {
+                html += `<li>${step}</li>`;
+            } else {
+                html += `<li>
+                    ${step.text}
+                    ${renderSteps(step.substeps, level + 1)}
+                </li>`;
             }
-          ]
-        },
-        "Mix everything together"
-      ]
-    },
-    {
-      id: 2,
-      title: "Chicken Tikka Masala",
-      description: "Creamy Indian curry",
-      time: 45,
-      difficulty: "medium",
-      ingredients: ["Chicken", "Tomato", "Cream", "Spices"],
-      steps: [
-        "Marinate chicken",
-        "Cook chicken",
-        {
-          text: "Make sauce",
-          substeps: [
-            "Heat oil",
-            "Add spices",
-            "Add tomato puree"
-          ]
-        },
-        "Combine chicken and sauce"
-      ]
-    }
-  ];
+        });
 
-  const container = document.getElementById("recipe-container");
+        html += "</ol>";
+        return html;
+    };
 
-  /* ---------- RECURSION ---------- */
-  const renderSteps = (steps) => {
-    let html = "<ul>";
-    steps.forEach(step => {
-      if (typeof step === "string") {
-        html += `<li>${step}</li>`;
-      } else {
-        html += `<li>${step.text}</li>`;
-        html += renderSteps(step.substeps);
-      }
-    });
-    html += "</ul>";
-    return html;
-  };
+    const createStepsHTML = (recipe) => {
+        return `
+            <div class="steps-container" data-id="${recipe.id}">
+                ${renderSteps(recipe.steps)}
+            </div>
+        `;
+    };
 
-  /* ---------- CARD ---------- */
-  const createRecipeCard = (recipe) => `
-    <div class="recipe-card">
-      <h3>${recipe.title}</h3>
-      <p>${recipe.description}</p>
-      <p>⏱ ${recipe.time} min | ${recipe.difficulty}</p>
+    /* ---------------- CARD TEMPLATE ---------------- */
+    const createRecipeCard = (recipe) => {
+        return `
+            <div class="recipe-card" data-id="${recipe.id}">
+                <h3>${recipe.title}</h3>
 
-      <button class="toggle-btn" data-id="${recipe.id}" data-type="steps">
-        Show Steps
-      </button>
-      <div class="steps-container" id="steps-${recipe.id}">
-        ${renderSteps(recipe.steps)}
-      </div>
+                <button class="toggle-btn" data-toggle="steps" data-id="${recipe.id}">
+                    Show Steps
+                </button>
 
-      <button class="toggle-btn" data-id="${recipe.id}" data-type="ingredients">
-        Show Ingredients
-      </button>
-      <div class="ingredients-container" id="ingredients-${recipe.id}">
-        <ul>
-          ${recipe.ingredients.map(i => `<li>${i}</li>`).join("")}
-        </ul>
-      </div>
-    </div>
-  `;
+                <button class="toggle-btn" data-toggle="ingredients" data-id="${recipe.id}">
+                    Show Ingredients
+                </button>
 
-  /* ---------- RENDER ---------- */
-  const renderRecipes = () => {
-    container.innerHTML = recipes.map(createRecipeCard).join("");
-  };
+                ${createStepsHTML(recipe)}
 
-  /* ---------- EVENT DELEGATION ---------- */
-  container.addEventListener("click", (e) => {
-    if (!e.target.classList.contains("toggle-btn")) return;
+                <ul class="ingredients-container" data-id="${recipe.id}">
+                    ${recipe.ingredients.map(i => `<li>${i}</li>`).join("")}
+                </ul>
+            </div>
+        `;
+    };
 
-    const id = e.target.dataset.id;
-    const type = e.target.dataset.type;
-    const box = document.getElementById(`${type}-${id}`);
+    /* ---------------- RENDER ---------------- */
+    const updateDisplay = () => {
+        recipeContainer.innerHTML = recipes.map(createRecipeCard).join("");
+    };
 
-    box.classList.toggle("visible");
+    /* ---------------- EVENT DELEGATION ---------------- */
+    const handleToggleClick = (e) => {
+        if (!e.target.classList.contains("toggle-btn")) return;
 
-    e.target.textContent = box.classList.contains("visible")
-      ? `Hide ${type}`
-      : `Show ${type}`;
-  });
+        const id = e.target.dataset.id;
+        const type = e.target.dataset.toggle;
 
-  /* ---------- INIT ---------- */
-  const init = () => {
-    renderRecipes();
-    console.log("RecipeApp ready!");
-  };
+        const container = document.querySelector(
+            `.${type}-container[data-id="${id}"]`
+        );
 
-  return { init };
+        container.classList.toggle("visible");
+
+        e.target.textContent = container.classList.contains("visible")
+            ? `Hide ${type.charAt(0).toUpperCase() + type.slice(1)}`
+            : `Show ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    };
+
+    const setupEventListeners = () => {
+        recipeContainer.addEventListener("click", handleToggleClick);
+        console.log("Event listeners attached!");
+    };
+
+    /* ---------------- PUBLIC API ---------------- */
+    const init = () => {
+        updateDisplay();
+        setupEventListeners();
+        console.log("RecipeApp ready!");
+    };
+
+    return {
+        init,
+        updateDisplay
+    };
 })();
 
 RecipeApp.init();
